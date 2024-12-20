@@ -7,9 +7,9 @@
 SECONDS=0 # builtin bash timer
 ZIPNAME="NakamaKernel-ginkgo-$(TZ=Asia/Kolkata date +"%Y%m%d-%H%M").zip"
 ZIPNAME_KSU="NakamaKernel-ginkgo-KSU-$(TZ=Asia/Kolkata date +"%Y%m%d-%H%M").zip"
-TC_DIR="$HOME/tc/clang"
-GCC_64_DIR="$HOME/tc/aarch64-linux-android-4.9"
-GCC_32_DIR="$HOME/tc/arm-linux-androideabi-4.9"
+TC_DIR="/workspace/gitpod/tc/clang"
+GCC_64_DIR="/workspace/gitpod/tc/aarch64-linux-android-4.9"
+GCC_32_DIR="/workspace/gitpod/tc/arm-linux-androideabi-4.9"
 AK3_DIR="AnyKernel3"
 DEFCONFIG="vendor/ginkgo-perf_defconfig"
 export PATH="$TC_DIR/bin:$PATH"
