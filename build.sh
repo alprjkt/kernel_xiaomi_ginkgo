@@ -6,6 +6,7 @@
 
 SECONDS=0 # builtin bash timer
 ZIPNAME="NakamaKernel-ginkgo-$(TZ=Asia/Kolkata date +"%Y%m%d-%H%M").zip"
+ZIPNAME_KSU="NakamaKernel-ginkgo-KSU-$(TZ=Asia/Kolkata date +"%Y%m%d-%H%M").zip"
 TC_DIR="$HOME/tc/clang"
 GCC_64_DIR="$HOME/tc/aarch64-linux-android-4.9"
 GCC_32_DIR="$HOME/tc/arm-linux-androideabi-4.9"
@@ -42,6 +43,24 @@ exit 1
 fi
 fi
 
+if [[ $1 = "-k" || $1 = "--ksu" ]]; then
+	echo -e "\nCleanup KernelSU first on local build\n"
+	rm -rf KernelSU drivers/kernelsu
+else
+	echo -e "\nSet No KernelSU Install, just skip\n"
+fi
+
+# Set function for override kernel name and variants
+if [[ $1 = "-k" || $1 = "--ksu" ]]; then
+echo -e "\nKSU Support, let's Make it On\n"
+curl -kLSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -
+git apply KernelSU-hook.patch
+sed -i 's/CONFIG_KSU=n/CONFIG_KSU=y/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
+sed -i 's/CONFIG_LOCALVERSION="-NakamaKernel"/CONFIG_LOCALVERSION="-NakamaKernel-KSU"/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
+else
+echo -e "\nKSU not Support, let's Skip\n"
+fi
+
 if [[ $1 = "-r" || $1 = "--regen" ]]; then
 make O=out ARCH=arm64 $DEFCONFIG savedefconfig
 cp out/defconfig arch/arm64/configs/$DEFCONFIG
@@ -62,6 +81,19 @@ cp out/arch/arm64/boot/dtbo.img AnyKernel3
 rm -f *zip
 cd AnyKernel3
 git checkout master &> /dev/null
+if [[ $1 = "-k" || $1 = "--ksu" ]]; then
+zip -r9 "../$ZIPNAME_KSU" * -x '*.git*' README.md *placeholder
+else
 zip -r9 "../$ZIPNAME" * -x '*.git*' README.md *placeholder
+fi
 cd ..
 echo -e "\nCompleted in $((SECONDS / 60)) minute(s) and $((SECONDS % 60)) second(s) !"
+if [[ $1 = "-k" || $1 = "--ksu" ]]; then
+echo "Zip: $ZIPNAME_KSU"
+else
+echo "Zip: $ZIPNAME"
+fi
+else
+echo -e "\nCompilation failed!"
+exit 1
+fi
