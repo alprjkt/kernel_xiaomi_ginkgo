@@ -93,7 +93,3 @@ echo "Zip: $ZIPNAME_KSU"
 else
 echo "Zip: $ZIPNAME"
 fi
-else
-echo -e "\nCompilation failed!"
-exit 1
-fi
